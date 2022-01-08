@@ -7,6 +7,16 @@ export const Game = () => {
     const gameRef = useRef<HTMLDivElement>(null)
 
     const handleKey = useCallback((event: KeyboardEvent) => {
+        const mapping: { [key: string]: () => void } = {
+            'ArrowRight': () => {
+                core.current.move(.5, 0)
+            },
+            'ArrowLeft': () => {
+                core.current.move(-.5, 0)
+            }
+        }
+
+        mapping[event.key]?.()
         console.log(event.key)
     }, [])
 

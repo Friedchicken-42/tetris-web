@@ -45,7 +45,7 @@ class Core {
             name: 'I',
             blocks: [[0, 0, 1], [1, 0, 1], [2, 0, 1], [3, 0, 1]],
             center: [2, 0],
-            color: 'ff8000'
+            color: '00ffff'
         }]
 
         this.queueLimit = 10
@@ -57,7 +57,7 @@ class Core {
         console.log(this.queue)
 
         this.current = this.nextMino()
-        this.current.move(4, 0)
+        this.current.move(2.5, 2)
         console.log(this.current)
     }
 
@@ -94,40 +94,39 @@ class Core {
         return board
     }
 
-    getNeighborsBlock(block: Block): Set<Point> {
-        const neighbors = new Set<Point>()
+    getNeighbors(block: Block): Map<string, Point> {
+        const neighbors = new Map<string, Point>()
         const center = block.polygon.center;
 
         for (let y of [-1, 0, 1]){
             for (let x of [-1, 0, 1]){
-                const point = new Point(Math.round(center.x) + x, Math.round(center.y) + y)
+                const point = new Point(Math.round(center.x - .5) + x, Math.round(center.y - .5) + y)
                 if (
                     point.x >= -1 && point.x <= this.width &&
                     point.y >= 0 && point.y <= this.height
-                ) neighbors.add(point)
+                ) {
+                    const key = '' + point.y + '-' + point.x
+                    neighbors.set(key, point)
+                }
             }
         }
         return neighbors
     }
 
-    getNeighbors(): Set<Point> {
-        let neighbors = new Set<Point>()
-
-        for (const block of this.current.blocks) {
-            this.getNeighborsBlock(block)
-                .forEach((point: Point) => neighbors.add(point))
-        }
-
-        return neighbors
-    }
-
     merge() {
         let board = this.copyField()
-        let neighbors = this.getNeighbors()
-        // set broken with object -> map
-        console.log(neighbors)
+        let error = false;
+        for (const block of this.current.blocks) {
+            let neighbors = this.getNeighbors(block)
 
-        return board
+            for(const { x, y } of Array.from(neighbors.values())){
+                const cell = board.cells[y][x + 1]
+                error ||= cell.intersect(block)
+                cell.setColor(this.current.color)
+            }
+        }
+
+        return error ? this.field : board
     }
 }
 

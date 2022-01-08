@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { Core, Field, Cell } from '../logic/Core'
+import { RGBToHex } from '../logic/Color'
 
 type PlayfieldProps = {
     core: Core;
@@ -12,22 +13,25 @@ export const Playfield = ({ core }: PlayfieldProps) => {
     const [time, setTime] = useState(Date.now())
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
-    setTimeout(() => {
-
-        draw(core.merge())
-    }, 500)
 /*
     useEffect(() => {
+        setTimeout(() => {
+            draw(core.merge())
+        }, 500)
+    }, [])
+    */
+
+    useEffect(() => {
         const interval = setInterval(() => setTime(Date.now()), 200);
-        if (core) draw(core.field)
+        if (core) draw(core.merge())
         console.log('redraw')
         return () => {
             clearInterval(interval)
         }
     }, [time])
-*/
+    
     const drawCell = (ctx: any, cell: Cell) => {
-        const { position, color } = cell
+        const { position, color, area } = cell
 
         ctx.fillStyle = '#000'
 
@@ -37,8 +41,11 @@ export const Playfield = ({ core }: PlayfieldProps) => {
             multiplier,
             multiplier
         )
+        
+        const hex = RGBToHex(color)
+        const alpha = Math.round(area * 255).toString(16)
 
-        ctx.fillStyle = cell.area === 0 ? '#111' : color;
+        ctx.fillStyle = area === 0 ? '#111' : hex + alpha;
 
         ctx.fillRect(
             position.x * multiplier + lineWidth,

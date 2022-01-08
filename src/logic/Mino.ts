@@ -1,25 +1,17 @@
 import { Vector3 } from './Vector3'
 import { Point, Polygon } from 'intersection'
-
-class Block {
-    polygon: Polygon;
-    density: number;
-
-    constructor(polygon: Polygon, density: number) {
-        this.polygon = polygon
-        this.density = density
-    }
-}
+import { Block } from './Block'
+import { Color, hexToRGB } from './Color'
 
 class Mino {
     name: string;
     blocks: Block[];
     center: Point;
-    color: string;
+    color: Color;
 
     constructor(name: string, coords: Vector3[], center: Point | null, color: string) {
         this.name = name;
-        this.color = color;
+        this.color = hexToRGB(color);
         this.blocks = []
         for (const { x, y, z } of coords) {
             const square = new Polygon([
