@@ -3,7 +3,7 @@ import { Vector3 } from './Vector3'
 import { Mino, Block } from './Mino'
 import { Cell } from './Cell'
 
-class Field {
+class Board {
     cells: Cell[][];
 
     constructor(width: number, height: number) {
@@ -28,18 +28,20 @@ type MinoJSON = {
 type ArrayLeastOne<T> = [T, ...T[]];
 
 class Core {
-    width: number;
+    width: number
     height: number;
-    field: Field;
+    _board: Board;
+    board: Board;
     pieces: ArrayLeastOne<MinoJSON>;
     queue: ArrayLeastOne<Mino>;
     queueLimit: number;
-    current: Mino;
+    mino: Mino;
 
     constructor(width: number, height: number) {
         this.width = width
         this.height = height
-        this.field = new Field(width, height)
+        this._board = new Board(width, height)
+        this.board = this._board
 
         this.pieces = [{
             name: 'I',
@@ -56,9 +58,11 @@ class Core {
         this.queue = queue as ArrayLeastOne<Mino>
         console.log(this.queue)
 
-        this.current = this.nextMino()
-        this.current.move(2.5, 2)
-        console.log(this.current)
+        this.mino = this.nextMino()
+        // temp
+        this.mino.move(3, 7)
+        this.board = this.merge()!
+        console.log(this.mino)
     }
 
     nextMino(): Mino {
@@ -73,7 +77,7 @@ class Core {
             bag.push(new Mino(
                 name,
                 blocks.map(([x, y, z]) => new Vector3(x, y, z)),
-                new Point(center[0], center[1]),
+                new Point(center[0] + .5, center[1] + .5),
                 color
             ))
         }
@@ -83,12 +87,12 @@ class Core {
         return bag as ArrayLeastOne<Mino>
     }
 
-    copyField(): Field {
-        let board = new Field(this.width, this.height)
+    copyBoard(): Board {
+        let board = new Board(this.width, this.height)
         for(let i = 0; i < this.height; i++){
             for(let j = 0; j < this.width; j++){
-                board.cells[i][j].area = this.field.cells[i][j].area;
-                board.cells[i][j].color = this.field.cells[i][j].color;
+                board.cells[i][j].area = this._board.cells[i][j].area;
+                board.cells[i][j].color = this._board.cells[i][j].color;
             }
         }
         return board
@@ -113,21 +117,46 @@ class Core {
         return neighbors
     }
 
-    merge() {
-        let board = this.copyField()
+    merge(): Board | null {
+        let board = this.copyBoard()
         let error = false;
-        for (const block of this.current.blocks) {
+        for (const block of this.mino.blocks) {
             let neighbors = this.getNeighbors(block)
 
             for(const { x, y } of Array.from(neighbors.values())){
                 const cell = board.cells[y][x + 1]
                 error ||= cell.intersect(block)
-                cell.setColor(this.current.color)
+                cell.setColor(this.mino.color)
             }
         }
+        return !error ? board : null
+    }
 
-        return error ? this.field : board
+    move(x: number, y: number) {
+        this.mino.move(x, y)
+        const newBoard = this.merge()
+        if (newBoard) {
+            this.board = newBoard
+        } else {
+            this.mino.move(-x, -y)
+        }
+    }
+
+    rotate(angle: number) {
+        this.mino.rotate(angle)
+        const newBoard = this.merge()
+        if (newBoard) {
+            this.board = newBoard
+        } else {
+            this.mino.rotate(-angle)
+        }
+    }
+
+    place() {
+        this._board = this.board;
+        this.mino = this.nextMino()
+        this.merge()
     }
 }
 
-export { Core, Field, Cell };
+export { Core, Board, Cell };

@@ -9,15 +9,23 @@ export const Game = () => {
     const handleKey = useCallback((event: KeyboardEvent) => {
         const mapping: { [key: string]: () => void } = {
             'ArrowRight': () => {
-                core.current.move(.5, 0)
+                core.move(1, 0)
             },
             'ArrowLeft': () => {
-                core.current.move(-.5, 0)
-            }
+                core.move(-1, 0)
+            },
+            'ArrowDown': () => {
+                core.move(0, 1)
+            },
+            'z': () => {
+                core.rotate(Math.PI / 2)
+            },
+            ' ': () => {
+                core.place()
+            },
         }
 
         mapping[event.key]?.()
-        console.log(event.key)
     }, [])
 
     useEffect(() => {

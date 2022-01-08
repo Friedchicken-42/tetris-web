@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { Core, Field, Cell } from '../logic/Core'
+import { Core, Board, Cell } from '../logic/Core'
 import { RGBToHex } from '../logic/Color'
 
 type PlayfieldProps = {
@@ -22,8 +22,8 @@ export const Playfield = ({ core }: PlayfieldProps) => {
     */
 
     useEffect(() => {
-        const interval = setInterval(() => setTime(Date.now()), 200);
-        if (core) draw(core.merge())
+        const interval = setInterval(() => setTime(Date.now()), 50);
+        if (core) draw(core.board)
         console.log('redraw')
         return () => {
             clearInterval(interval)
@@ -53,9 +53,13 @@ export const Playfield = ({ core }: PlayfieldProps) => {
             multiplier - lineWidth * 2,
             multiplier - lineWidth * 2
         )
+
+        ctx.fillStyle = '#fff'
+        ctx.font = '18px Arial'
+        ctx.fillText(area, (position.x + .4) * multiplier, (position.y + .5) * multiplier)
     }
 
-    const draw = (field: Field) => {
+    const draw = (board: Board) => {
         if (!canvasRef.current) return
         const canvas: HTMLCanvasElement = canvasRef.current
         const ctx = canvas.getContext('2d')
@@ -63,7 +67,7 @@ export const Playfield = ({ core }: PlayfieldProps) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.lineWidth = 0
 
-        field.cells.forEach((cells: Cell[]) => {
+        board.cells.forEach((cells: Cell[]) => {
             cells.forEach((cell: Cell) => {
                 drawCell(ctx, cell)
             })

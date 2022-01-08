@@ -22,7 +22,7 @@ class Cell {
 
     intersect(block: Block): boolean {
         const intersection = this.polygon.intersectPoly(block.polygon)
-        if (!intersection) return false
+        if (!intersection) return false;
         let area = intersection.area() * block.density;
         if (area + this.area > 1)  return true;
         this.area += area;
