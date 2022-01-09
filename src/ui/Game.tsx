@@ -1,34 +1,46 @@
-import { useEffect, useCallback, useRef } from 'react'
+import { useEffect, useCallback, useRef, useState } from 'react'
 import { Playfield } from './Playfield'
-import { Core } from '../logic/Core'
+import { Core, MinoJSON } from '../logic/Core'
 
 export const Game = () => {
-    let core = new Core(10, 20)
+    const coreRef = useRef<Core>()
+    const [_, done] = useState<boolean>(false)
+
+    useEffect(() => {
+        const init = async () => {
+            let pieces: MinoJSON[] = await fetch(process.env.PUBLIC_URL + '/pieces.json')
+                .then(data => data.json())
+            coreRef.current = new Core(10, 20, pieces)
+            done(true)
+        }
+        init()
+    }, [])
     const gameRef = useRef<HTMLDivElement>(null)
 
     const handleKey = useCallback((event: KeyboardEvent) => {
+        const core = coreRef.current
         const mapping: { [key: string]: () => void } = {
             'ArrowRight': () => {
-                core.move(.5, 0)
+                core?.move(.5, 0)
             },
             'ArrowLeft': () => {
-                core.move(-.5, 0)
+                core?.move(-.5, 0)
             },
             'ArrowDown': () => {
-                core.move(0, 1)
+                core?.move(0, 1)
             },
             'z': () => {
-                core.rotate(Math.PI / 4)
+                core?.rotate(Math.PI / 4)
             },
             'x': () => {
-                core.rotate(-Math.PI / 4)
+                core?.rotate(-Math.PI / 4)
             },
             ' ': () => {
-                core.place()
+                core?.place()
             },
             'd': () => {
-                console.log(core.mino)
-                console.log(core.board)
+                console.log(core?.mino)
+                console.log(core?.board)
             },
         }
 
@@ -46,7 +58,10 @@ export const Game = () => {
 
     return (
         <div ref={gameRef}>
-            <Playfield core={core}/>
+            {coreRef.current
+                ? <Playfield core={coreRef.current}/>
+                : <div>Loading pieces</div>
+            }
         </div>
     )
 }

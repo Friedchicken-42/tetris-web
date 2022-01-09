@@ -9,7 +9,7 @@ class Mino {
     center: Point;
     color: Color;
 
-    constructor(name: string, coords: Vector3[], center: Point | null, color: string) {
+    constructor(name: string, coords: Vector3[], center: number[] | null, color: string) {
         this.name = name;
         this.color = hexToRGB(color);
         this.blocks = []
@@ -24,7 +24,7 @@ class Mino {
         }
 
         if (center) {
-            this.center = center
+            this.center = new Point(center[0] + .5, center[1] + .5)
         } else {
             const centers = this.blocks.map((block: Block) => block.polygon.center)
             this.center = new Polygon(centers).center
@@ -41,6 +41,17 @@ class Mino {
     rotate(angle: number) {
         for (let i = 0; i < this.blocks.length; i++){
             this.blocks[i].polygon.rotateFromPoint(angle, this.center)
+        }
+    }
+
+    round() {
+        for (let i = 0; i < this.blocks.length; i++){
+            const polygon = this.blocks[i].polygon
+            for (let j = 0; j < polygon.points.length; j++) {
+                polygon.points[j].x = Math.round(polygon.points[j].x * 10) / 10
+                polygon.points[j].y = Math.round(polygon.points[j].y * 10) / 10
+            }
+            polygon.setCenter()
         }
     }
 }

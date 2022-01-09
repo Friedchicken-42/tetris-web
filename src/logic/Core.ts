@@ -18,7 +18,7 @@ class Board {
     }
 }
 
-type MinoJSON = {
+export type MinoJSON = {
     name: string;
     blocks: [number, number, number][];
     center: number[];
@@ -35,18 +35,13 @@ class Core {
     queueLimit: number;
     mino: Mino;
 
-    constructor(width: number, height: number) {
+    constructor(width: number, height: number, pieces: MinoJSON[]) {
         this.width = width
         this.height = height
         this._board = new Board(width, height)
         this.board = this._board
 
-        this.pieces = [{
-            name: 'I',
-            blocks: [[0, 0, 1], [1, 0, 1], [2, 0, 1], [3, 0, 1]],
-            center: [2, 0],
-            color: '00ffff'
-        }]
+        this.pieces = pieces
 
         this.queueLimit = 10
         let queue = []
@@ -75,7 +70,7 @@ class Core {
             bag.push(new Mino(
                 name,
                 blocks.map(([x, y, z]) => new Vector3(x, y, z)),
-                new Point(center[0] + .5, center[1] + .5),
+                center,
                 color
             ))
         }
@@ -153,6 +148,7 @@ class Core {
             () => this.mino.rotate(angle),
             () => this.mino.rotate(-angle)
         )
+        this.mino.round()
     }
 
     place() {
