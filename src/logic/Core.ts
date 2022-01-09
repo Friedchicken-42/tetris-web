@@ -25,15 +25,13 @@ type MinoJSON = {
     color: string;
 }
 
-type ArrayLeastOne<T> = [T, ...T[]];
-
 class Core {
     width: number
     height: number;
     _board: Board;
     board: Board;
-    pieces: ArrayLeastOne<MinoJSON>;
-    queue: ArrayLeastOne<Mino>;
+    pieces: MinoJSON[] 
+    queue: Mino[];
     queueLimit: number;
     mino: Mino;
 
@@ -55,7 +53,7 @@ class Core {
         while(queue.length <= this.queueLimit){
             queue.push(...this.newBag())
         }
-        this.queue = queue as ArrayLeastOne<Mino>
+        this.queue = queue as Mino[]
         console.log(this.queue)
 
         this.mino = this.nextMino()
@@ -70,7 +68,7 @@ class Core {
         return this.queue.shift()!
     }
 
-    newBag(): ArrayLeastOne<Mino> {
+    newBag(): Mino[] {
         let bag: Mino[] = []
         
         for(const { name, blocks, center, color } of this.pieces){
@@ -84,13 +82,13 @@ class Core {
 
         bag.sort((_, __) => Math.random() * 2 - 1)
 
-        return bag as ArrayLeastOne<Mino>
+        return bag
     }
 
     copyBoard(): Board {
         let board = new Board(this.width, this.height)
         for(let i = 0; i < this.height; i++){
-            for(let j = 0; j < this.width; j++){
+            for(let j = 0; j < this.width + 1; j++){
                 board.cells[i][j].area = this._board.cells[i][j].area;
                 board.cells[i][j].color = this._board.cells[i][j].color;
             }
@@ -132,30 +130,36 @@ class Core {
         return !error ? board : null
     }
 
-    move(x: number, y: number) {
-        this.mino.move(x, y)
+    tryAction(action: () => void, rollback: () => void) {
+        action()
         const newBoard = this.merge()
         if (newBoard) {
             this.board = newBoard
         } else {
-            this.mino.move(-x, -y)
+            rollback()
         }
+
+    }
+
+    move(x: number, y: number) {
+        this.tryAction(
+            () => this.mino.move(x, y),
+            () => this.mino.move(-x, -y)
+        )
     }
 
     rotate(angle: number) {
-        this.mino.rotate(angle)
-        const newBoard = this.merge()
-        if (newBoard) {
-            this.board = newBoard
-        } else {
-            this.mino.rotate(-angle)
-        }
+        this.tryAction(
+            () => this.mino.rotate(angle),
+            () => this.mino.rotate(-angle)
+        )
     }
 
     place() {
-        this._board = this.board;
+        this._board = this.board
         this.mino = this.nextMino()
-        this.merge()
+        this.mino.move(1, 1)
+        this.board = this.merge()!
     }
 }
 
