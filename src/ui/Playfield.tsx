@@ -13,14 +13,6 @@ export const Playfield = ({ core }: PlayfieldProps) => {
     const [time, setTime] = useState(Date.now())
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
-/*
-    useEffect(() => {
-        setTimeout(() => {
-            draw(core.merge())
-        }, 500)
-    }, [])
-    */
-
     useEffect(() => {
         const interval = setInterval(() => setTime(Date.now()), 50);
         if (core) draw(core.board)

@@ -91,8 +91,8 @@ class Core {
         return board
     }
 
-    getNeighbors(block: Block): Map<string, Point> {
-        const neighbors = new Map<string, Point>()
+    getNeighbors(block: Block): Point[] {
+        const neighbors: Point[] = []
         const center = block.polygon.center;
 
         for (let y of [-1, 0, 1]){
@@ -102,8 +102,7 @@ class Core {
                     point.x >= -1 && point.x <= this.width &&
                     point.y >= 0 && point.y <= this.height
                 ) {
-                    const key = '' + point.y + '-' + point.x
-                    neighbors.set(key, point)
+                    neighbors.push(point)
                 }
             }
         }
@@ -116,24 +115,33 @@ class Core {
         for (const block of this.mino.blocks) {
             let neighbors = this.getNeighbors(block)
 
-            for(const { x, y } of Array.from(neighbors.values())){
+            for(const { x, y } of neighbors){
                 const cell = board.cells[y][x + 1]
-                error ||= cell.intersect(block)
+                const area = cell.intersect(block)
+                if (area === 0) continue;
+                if (cell.area + area > 1) {
+                    error = true
+                    continue
+                }
+                cell.area += area
+                cell.area = Math.round(cell.area * 10) / 10
                 cell.setColor(this.mino.color)
             }
         }
         return !error ? board : null
     }
 
-    tryAction(action: () => void, rollback: () => void) {
+    tryAction(action: () => void, rollback: () => void): boolean {
         action()
+        this.mino.round()
         const newBoard = this.merge()
         if (newBoard) {
             this.board = newBoard
+            return true
         } else {
             rollback()
         }
-
+        return false
     }
 
     move(x: number, y: number) {
@@ -148,7 +156,16 @@ class Core {
             () => this.mino.rotate(angle),
             () => this.mino.rotate(-angle)
         )
-        this.mino.round()
+    }
+
+    harddrop(offset: number) {
+        while(
+            this.tryAction(
+                () => this.mino.move(0, offset),
+                () => this.mino.move(0, -offset)
+            )
+        ){}
+        this.place()
     }
 
     place() {

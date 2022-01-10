@@ -20,14 +20,11 @@ class Cell {
         this.area = area
     }
 
-    intersect(block: Block): boolean {
+    intersect(block: Block): number {
         const intersection = this.polygon.intersectPoly(block.polygon)
-        if (!intersection) return false;
+        if (!intersection) return 0;
         let area = intersection.area() * block.density;
-        area = Math.round(area * 10) / 10
-        if (area + this.area > 1)  return true;
-        this.area += area;
-        return false
+        return area;
     }
 
 

@@ -27,7 +27,7 @@ export const Game = () => {
                 core?.move(-.5, 0)
             },
             'ArrowDown': () => {
-                core?.move(0, 1)
+                core?.move(0, .5)
             },
             'z': () => {
                 core?.rotate(Math.PI / 4)
@@ -36,7 +36,7 @@ export const Game = () => {
                 core?.rotate(-Math.PI / 4)
             },
             ' ': () => {
-                core?.place()
+                core?.harddrop(.5)
             },
             'd': () => {
                 console.log(core?.mino)
