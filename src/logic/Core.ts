@@ -1,22 +1,7 @@
-import { Point } from 'intersection'
 import { Vector3 } from './Vector3'
-import { Mino, Block } from './Mino'
+import { Mino } from './Mino'
 import { Cell } from './Cell'
-
-class Board {
-    cells: Cell[][];
-
-    constructor(width: number, height: number) {
-        this.cells = []
-        for(let i = 0; i < height + 1; i++){
-            this.cells.push([])
-            for(let j = -1; j < width + 1; j++){
-                const density = (i === height || j === -1 || j === width) ? 1 : 0;
-                this.cells[i].push(new Cell(j, i, density));
-            }
-        }
-    }
-}
+import { Board } from './Board'
 
 export type MinoJSON = {
     name: string;
@@ -27,24 +12,31 @@ export type MinoJSON = {
 
 class Core {
     width: number
+
     height: number;
-    _board: Board;
+
+    backup: Board;
+
     board: Board;
-    pieces: MinoJSON[] 
+
+    pieces: MinoJSON[]
+ 
     queue: Mino[];
+
     queueLimit: number;
+
     mino: Mino;
 
     constructor(width: number, height: number, pieces: MinoJSON[]) {
         this.width = width
         this.height = height
-        this._board = new Board(width, height)
-        this.board = this._board
+        this.backup = new Board(width, height)
+        this.board = this.backup
 
         this.pieces = pieces
 
         this.queueLimit = 10
-        let queue = []
+        const queue = []
         while(queue.length <= this.queueLimit){
             queue.push(...this.newBag())
         }
@@ -54,7 +46,7 @@ class Core {
         this.mino = this.nextMino()
         // temp
         this.mino.move(3, 7)
-        this.board = this.merge()!
+        this.board = this.board.merge(this.mino)!
         console.log(this.mino)
     }
 
@@ -64,7 +56,7 @@ class Core {
     }
 
     newBag(): Mino[] {
-        let bag: Mino[] = []
+        const bag: Mino[] = []
         
         for(const { name, blocks, center, color } of this.pieces){
             bag.push(new Mino(
@@ -80,67 +72,16 @@ class Core {
         return bag
     }
 
-    copyBoard(): Board {
-        let board = new Board(this.width, this.height)
-        for(let i = 0; i < this.height; i++){
-            for(let j = 0; j < this.width + 1; j++){
-                board.cells[i][j].area = this._board.cells[i][j].area;
-                board.cells[i][j].color = this._board.cells[i][j].color;
-            }
-        }
-        return board
-    }
-
-    getNeighbors(block: Block): Point[] {
-        const neighbors: Point[] = []
-        const center = block.polygon.center;
-
-        for (let y of [-1, 0, 1]){
-            for (let x of [-1, 0, 1]){
-                const point = new Point(Math.round(center.x - .5) + x, Math.round(center.y - .5) + y)
-                if (
-                    point.x >= -1 && point.x <= this.width &&
-                    point.y >= 0 && point.y <= this.height
-                ) {
-                    neighbors.push(point)
-                }
-            }
-        }
-        return neighbors
-    }
-
-    merge(): Board | null {
-        let board = this.copyBoard()
-        let error = false;
-        for (const block of this.mino.blocks) {
-            let neighbors = this.getNeighbors(block)
-
-            for(const { x, y } of neighbors){
-                const cell = board.cells[y][x + 1]
-                const area = cell.intersect(block)
-                if (area === 0) continue;
-                if (cell.area + area > 1) {
-                    error = true
-                    continue
-                }
-                cell.area += area
-                cell.area = Math.round(cell.area * 10) / 10
-                cell.setColor(this.mino.color)
-            }
-        }
-        return !error ? board : null
-    }
-
     tryAction(action: () => void, rollback: () => void): boolean {
         action()
-        this.mino.round()
-        const newBoard = this.merge()
+        // this.mino.round()
+        const newBoard = this.backup.merge(this.mino)
         if (newBoard) {
             this.board = newBoard
             return true
-        } else {
+        } 
             rollback()
-        }
+        
         return false
     }
 
@@ -164,15 +105,15 @@ class Core {
                 () => this.mino.move(0, offset),
                 () => this.mino.move(0, -offset)
             )
-        ){}
+        );
         this.place()
     }
 
     place() {
-        this._board = this.board
+        this.backup = this.board
         this.mino = this.nextMino()
         this.mino.move(1, 1)
-        this.board = this.merge()!
+        this.board = this.board.merge(this.mino)!
     }
 }
 

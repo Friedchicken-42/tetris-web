@@ -1,11 +1,14 @@
 import { Point, Polygon } from 'intersection'
 import { Block } from './Block'
-import { Color, hexToRGB, blend } from './Color'
+import { Color, blend } from './Color'
 
 class Cell {
     polygon: Polygon;
+
     position: Point;
+
     color: Color | null;
+
     area: number;
 
     constructor(x: number, y: number, area: number){
@@ -23,10 +26,10 @@ class Cell {
     intersect(block: Block): number {
         const intersection = this.polygon.intersectPoly(block.polygon)
         if (!intersection) return 0;
-        let area = intersection.area() * block.density;
+        const area = intersection.area() * block.density;
+
         return area;
     }
-
 
     setColor(color: Color) {
         if(this.area === 0) return 

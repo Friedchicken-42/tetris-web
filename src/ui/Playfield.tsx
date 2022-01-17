@@ -1,26 +1,17 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
-import { Core, Board, Cell } from '../logic/Core'
+import React, { useEffect, useState, useRef, MutableRefObject } from 'react'
+import { Board, Cell } from '../logic/Core'
 import { RGBToHex } from '../logic/Color'
 
 type PlayfieldProps = {
-    core: Core;
+    board: Board
+    multiplier: number
 }
 
-export const Playfield = ({ core }: PlayfieldProps) => {
-    const multiplier = 50
+export function Playfield({ board, multiplier }: PlayfieldProps) {
     const lineWidth = 1
 
     const [time, setTime] = useState(Date.now())
     const canvasRef = useRef<HTMLCanvasElement>(null)
-
-    useEffect(() => {
-        const interval = setInterval(() => setTime(Date.now()), 50);
-        if (core) draw(core.board)
-        console.log('redraw')
-        return () => {
-            clearInterval(interval)
-        }
-    }, [time])
     
     const drawCell = (ctx: any, cell: Cell) => {
         const { position, color, area } = cell
@@ -51,8 +42,9 @@ export const Playfield = ({ core }: PlayfieldProps) => {
         ctx.fillText(area, (position.x + .4) * multiplier, (position.y + .5) * multiplier)
     }
 
-    const draw = (board: Board) => {
+    const draw = () => {
         if (!canvasRef.current) return
+        if (!board) return
         const canvas: HTMLCanvasElement = canvasRef.current
         const ctx = canvas.getContext('2d')
         if (!ctx) return
@@ -66,5 +58,14 @@ export const Playfield = ({ core }: PlayfieldProps) => {
         })
     }
 
-    return <canvas ref={canvasRef} width={core.width * multiplier} height={core.height * multiplier} tabIndex={1}/>
+    useEffect(() => {
+        const interval = setInterval(() => setTime(Date.now()), 50);
+        draw()
+        return () => {
+            clearInterval(interval)
+        }
+    }, [time])
+
+    /* eslint-disable-next-line */
+    return <canvas ref={canvasRef} width={board.width * multiplier} height={board.height * multiplier} tabIndex={1}/>
 }

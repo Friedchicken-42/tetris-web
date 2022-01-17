@@ -1,3 +1,4 @@
+import React from 'react'
 import './App.css';
 import { Game } from './Game'
 
@@ -9,4 +10,4 @@ function App() {
     );
 }
 
-export default App;
+export { App }

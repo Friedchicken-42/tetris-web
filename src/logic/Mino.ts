@@ -1,12 +1,15 @@
-import { Vector3 } from './Vector3'
 import { Point, Polygon } from 'intersection'
+import { Vector3 } from './Vector3'
 import { Block } from './Block'
 import { Color, hexToRGB } from './Color'
 
 class Mino {
     name: string;
+
     blocks: Block[];
+
     center: Point;
+
     color: Color;
 
     constructor(name: string, coords: Vector3[], center: number[] | null, color: string) {
@@ -32,28 +35,28 @@ class Mino {
     }
     
     move(x: number, y: number) {
-        for (let i = 0; i < this.blocks.length; i++){
+        for (let i = 0; i < this.blocks.length; i += 1) {
             this.blocks[i].polygon.translate(x, y)
         }
         this.center.translate(x, y)
     }
 
     rotate(angle: number) {
-        for (let i = 0; i < this.blocks.length; i++){
+        for (let i = 0; i < this.blocks.length; i += 1) {
             this.blocks[i].polygon.rotateFromPoint(angle, this.center)
         }
     }
 
     round() {
-        for (let i = 0; i < this.blocks.length; i++){
-            const polygon = this.blocks[i].polygon
-            for (let j = 0; j < polygon.points.length; j++) {
-                polygon.points[j].x = Math.round(polygon.points[j].x * 10) / 10
-                polygon.points[j].y = Math.round(polygon.points[j].y * 10) / 10
+        for (let i = 0; i < this.blocks.length; i += 1) {
+            const {polygon} = this.blocks[i]
+            for (let j = 0; j < polygon.points.length; j += 1) {
+                this.blocks[i].polygon.points[j].x = Math.round(polygon.points[j].x * 10) / 10
+                this.blocks[i].polygon.points[j].y = Math.round(polygon.points[j].y * 10) / 10
             }
             polygon.setCenter()
         }
     }
 }
         
-export { Mino, Block }
+export { Mino }

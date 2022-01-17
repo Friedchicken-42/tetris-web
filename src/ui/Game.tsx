@@ -1,16 +1,20 @@
-import { useEffect, useCallback, useRef, useState } from 'react'
+import React, { useEffect, useCallback, useRef, useState } from 'react'
 import { Playfield } from './Playfield'
+import { Preview } from './Preview'
 import { Core, MinoJSON } from '../logic/Core'
+import { Board } from '../logic/Board'
 
-export const Game = () => {
+export function Game() {
     const coreRef = useRef<Core>()
-    const [_, done] = useState<boolean>(false)
+    const [board, setBoard] = useState<Board>()
+    const [status, done] = useState<boolean>(false)
 
     useEffect(() => {
         const init = async () => {
-            let pieces: MinoJSON[] = await fetch(process.env.PUBLIC_URL + '/pieces.json')
+            const pieces: MinoJSON[] = await fetch(`${process.env.PUBLIC_URL  }/pieces.json`)
                 .then(data => data.json())
             coreRef.current = new Core(10, 20, pieces)
+            setBoard(coreRef.current.board)
             done(true)
         }
         init()
@@ -45,10 +49,11 @@ export const Game = () => {
         }
 
         mapping[event.key]?.()
+        setBoard(core?.board)
     }, [])
 
     useEffect(() => {
-        if (!gameRef.current) return
+        if (!gameRef.current) return undefined
         const div: HTMLDivElement = gameRef.current
         div.addEventListener('keydown', handleKey)
         return () => {
@@ -56,11 +61,15 @@ export const Game = () => {
         }
     }, [handleKey])
 
+
     return (
         <div ref={gameRef}>
-            {coreRef.current
-                ? <Playfield core={coreRef.current}/>
-                : <div>Loading pieces</div>
+            {!status
+                ? <div>Loading pieces</div>
+                : <div>
+                    <Playfield board={board!} multiplier={50} />
+                    <Preview queue={coreRef.current!.queue} />
+                </div>
             }
         </div>
     )
