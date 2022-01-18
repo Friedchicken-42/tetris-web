@@ -3,11 +3,23 @@ import { Playfield } from './Playfield'
 import { Preview } from './Preview'
 import { Core, MinoJSON } from '../logic/Core'
 import { Board } from '../logic/Board'
+import './game.css'
+
+type ScoreProps = {
+    points: number
+}
+
+function Score({points}: ScoreProps) {
+    const score = points.toString().padStart(10, '0')
+    return <div className="score">{score}</div>
+}
 
 export function Game() {
     const coreRef = useRef<Core>()
     const [board, setBoard] = useState<Board>()
+    const [points, setPoints] = useState<number>(0)
     const [status, done] = useState<boolean>(false)
+    const [time, setTime] = useState(Date.now())
 
     useEffect(() => {
         const init = async () => {
@@ -50,6 +62,7 @@ export function Game() {
 
         mapping[event.key]?.()
         setBoard(core?.board)
+        setPoints(core?.score!)
     }, [])
 
     useEffect(() => {
@@ -61,16 +74,22 @@ export function Game() {
         }
     }, [handleKey])
 
-
+    /* eslint-disable */
     return (
         <div ref={gameRef}>
             {!status
                 ? <div>Loading pieces</div>
-                : <div>
-                    <Playfield board={board!} multiplier={50} />
-                    <Preview queue={coreRef.current!.queue} />
+                : <div className="game">
+                    <div>
+                        <Score points={points!} />
+                        <Playfield board={board ? board : coreRef.current?.backup!} multiplier={50} />
+                    </div>
+                    <div className="preview">
+                        <Preview queue={coreRef.current!.queue} />
+                    </div>
                 </div>
             }
         </div>
     )
+    /* eslint-enable */
 }

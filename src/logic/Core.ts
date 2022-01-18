@@ -27,6 +27,12 @@ class Core {
 
     mino: Mino;
 
+    threshold: number;
+
+    score: number;
+
+    lock: number;
+    
     constructor(width: number, height: number, pieces: MinoJSON[]) {
         this.width = width
         this.height = height
@@ -41,13 +47,14 @@ class Core {
             queue.push(...this.newBag())
         }
         this.queue = queue as Mino[]
-        console.log(this.queue)
 
         this.mino = this.nextMino()
-        // temp
-        this.mino.move(3, 7)
+
         this.board = this.board.merge(this.mino)!
-        console.log(this.mino)
+
+        this.threshold = 1
+        this.score = 0
+        this.lock = 0
     }
 
     nextMino(): Mino {
@@ -74,22 +81,28 @@ class Core {
 
     tryAction(action: () => void, rollback: () => void): boolean {
         action()
-        // this.mino.round()
+
         const newBoard = this.backup.merge(this.mino)
         if (newBoard) {
             this.board = newBoard
             return true
         } 
-            rollback()
+        rollback()
         
         return false
     }
 
     move(x: number, y: number) {
-        this.tryAction(
+        const status = this.tryAction(
             () => this.mino.move(x, y),
             () => this.mino.move(-x, -y)
         )
+
+        if (y > 0 && !status) {
+            this.lock += 1
+            if (this.lock > 10) this.place();
+        }
+        console.log(this.lock)
     }
 
     rotate(angle: number) {
@@ -109,8 +122,16 @@ class Core {
         this.place()
     }
 
+    clearLines() {
+        const lines = this.board.clearLines(this.threshold)
+        const points = lines ** 2 * 100
+        this.score += points
+    }
+
     place() {
+        this.lock = 0
         this.backup = this.board
+        this.clearLines()
         this.mino = this.nextMino()
         this.mino.move(1, 1)
         this.board = this.board.merge(this.mino)!

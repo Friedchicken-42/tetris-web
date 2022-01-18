@@ -1,0 +1,14 @@
+.game {
+    display: flex;
+    justify-content: center;
+}
+
+.preview {
+    margin-top: 5em;
+}
+
+.score {
+    color: #fff;
+    font-size: 4em;
+    margin: .2em;
+}

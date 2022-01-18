@@ -37,9 +37,11 @@ export function Playfield({ board, multiplier }: PlayfieldProps) {
             multiplier - lineWidth * 2
         )
 
+        /*
         ctx.fillStyle = '#fff'
         ctx.font = '18px Arial'
         ctx.fillText(area, (position.x + .4) * multiplier, (position.y + .5) * multiplier)
+        */
     }
 
     const draw = () => {
@@ -66,6 +68,8 @@ export function Playfield({ board, multiplier }: PlayfieldProps) {
         }
     }, [time])
 
-    /* eslint-disable-next-line */
-    return <canvas ref={canvasRef} width={board.width * multiplier} height={board.height * multiplier} tabIndex={1}/>
+    return <div className="playfield">
+        {/* eslint-disable-next-line */}
+        <canvas ref={canvasRef} width={board.width * multiplier} height={board.height * multiplier} tabIndex={1}/>
+    </div>
 }

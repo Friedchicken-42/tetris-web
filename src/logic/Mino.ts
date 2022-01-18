@@ -46,6 +46,18 @@ class Mino {
             this.blocks[i].polygon.rotateFromPoint(angle, this.center)
         }
     }
+    
+    getContainer(): Point {
+        const container = this.blocks.reduce(( prev, block) => {
+            let x = block.polygon.center.x + .5
+            let y = block.polygon.center.y + .5
+            x = x > prev.x ? x : prev.x
+            y = y > prev.y ? y : prev.y
+            return new Point(x, y)
+        }, new Point(0, 0))
+
+        return container
+    }
 
     round() {
         for (let i = 0; i < this.blocks.length; i += 1) {

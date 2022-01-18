@@ -73,6 +73,28 @@ class Board {
         }
         return !error ? board : null
     }
+
+    clearLines(threshold: number): number {
+        let lines = 0
+
+        for(let i = 0; i < this.height; i += 1) {
+            let total = this.cells[i].reduce((prev: number, cell: Cell) => prev + cell.area, 0)
+            total -= 2
+
+            if (total < threshold * this.width) continue;
+
+            lines += 1
+
+            for (let j = i; j > 0; j -= 1) {
+                this.cells[j] = this.cells[j - 1]
+            }
+
+            this.cells[0] = this.cells[0].map(
+                (_, idx: number) => new Cell(idx - 1, 0, (idx === 0 || idx === this.width + 1) ? 1 : 0)
+            )
+        }
+        return lines
+    }
 }
 
 export { Board }
