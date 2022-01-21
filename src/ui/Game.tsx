@@ -74,15 +74,36 @@ export function Game() {
         }
     }, [handleKey])
 
-    /* eslint-disable */
+    useEffect(() => {
+        const interval = setInterval(() => setTime(Date.now()), 400);
+        const core = coreRef.current
+        if (core) {
+            core?.move(0, 1)
+            setBoard(core?.board)
+            setPoints(core?.score!)
+            if (!board) clearInterval(interval)
+        }
+        return () => {
+            clearInterval(interval)
+        }
+    }, [time])
+
     return (
         <div ref={gameRef}>
             {!status
-                ? <div>Loading pieces</div>
+                ? <div className="game">
+                    <div>
+                    <Score points={0} />
+                    <Playfield board={new Board(10, 20)} multiplier={50} />
+                    </div>
+                    <div className="preview">
+                        <Preview queue={[null, null, null, null, null]} />
+                    </div>
+                </div>
                 : <div className="game">
                     <div>
                         <Score points={points!} />
-                        <Playfield board={board ? board : coreRef.current?.backup!} multiplier={50} />
+                        <Playfield board={board ?? coreRef.current?.backup!} multiplier={50} />
                     </div>
                     <div className="preview">
                         <Preview queue={coreRef.current!.queue} />
@@ -91,5 +112,4 @@ export function Game() {
             }
         </div>
     )
-    /* eslint-enable */
 }

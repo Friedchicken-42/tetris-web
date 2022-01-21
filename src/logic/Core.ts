@@ -32,6 +32,8 @@ class Core {
     score: number;
 
     lock: number;
+
+    maxLock: number;
     
     constructor(width: number, height: number, pieces: MinoJSON[]) {
         this.width = width
@@ -55,6 +57,7 @@ class Core {
         this.threshold = 1
         this.score = 0
         this.lock = 0
+        this.maxLock = 6
     }
 
     nextMino(): Mino {
@@ -100,9 +103,8 @@ class Core {
 
         if (y > 0 && !status) {
             this.lock += 1
-            if (this.lock > 10) this.place();
+            if (this.lock > this.maxLock) this.place();
         }
-        console.log(this.lock)
     }
 
     rotate(angle: number) {

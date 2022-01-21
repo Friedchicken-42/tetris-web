@@ -5,15 +5,15 @@ import { Board } from '../logic/Board'
 import './preview.css'
 
 type PreviewProps = {
-    queue: Mino[]
+    queue: (Mino | null)[]
 }
 
 export function Preview({ queue }: PreviewProps) {
     return (
         <div className="container">
-        {queue.slice(0, 5).map((mino: Mino, idx: number) => {
+        {queue.slice(0, 5).map((mino: Mino | null, idx: number) => {
             let board = new Board(5, 5)
-            board = board.merge(mino)!
+            board = mino ? board.merge(mino)! : board
             const multiplier = 20 * (idx === 0 ? 1.5 : 1)
             /* eslint-disable-next-line */
             return <div key={idx} className="element">
