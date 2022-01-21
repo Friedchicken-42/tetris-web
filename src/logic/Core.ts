@@ -57,7 +57,7 @@ class Core {
         this.threshold = 1
         this.score = 0
         this.lock = 0
-        this.maxLock = 6
+        this.maxLock = 4
     }
 
     nextMino(): Mino {
@@ -80,6 +80,10 @@ class Core {
         bag.sort((_, __) => Math.random() * 2 - 1)
 
         return bag
+    }
+
+    setThreshold(value: number){
+        this.threshold = value / 10
     }
 
     tryAction(action: () => void, rollback: () => void): boolean {
@@ -131,6 +135,7 @@ class Core {
     }
 
     place() {
+        if (!this.board) return;
         this.lock = 0
         this.backup = this.board
         this.clearLines()

@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react'
+import store from '../store'
 import { Playfield } from './Playfield'
 import { Preview } from './Preview'
 import { Core, MinoJSON } from '../logic/Core'
@@ -35,28 +36,34 @@ export function Game() {
 
     const handleKey = useCallback((event: KeyboardEvent) => {
         const core = coreRef.current
+        if (!core) return;
+        const { movement, rotation } = store.getState().input
+        const radians = rotation * (Math.PI / 180)
+
         const mapping: { [key: string]: () => void } = {
             'ArrowRight': () => {
-                core?.move(.5, 0)
+                core?.move(movement, 0)
             },
             'ArrowLeft': () => {
-                core?.move(-.5, 0)
+                core?.move(-movement, 0)
             },
             'ArrowDown': () => {
-                core?.move(0, .5)
+                core?.move(0, movement)
             },
             'z': () => {
-                core?.rotate(Math.PI / 4)
+                core?.rotate(radians)
             },
             'x': () => {
-                core?.rotate(-Math.PI / 4)
+                core?.rotate(-radians)
+            },
+            'a': () => {
+                core?.rotate(radians * 2)
+            },
+            's': () => {
+                core?.rotate(-radians * 2)
             },
             ' ': () => {
-                core?.harddrop(.5)
-            },
-            'd': () => {
-                console.log(core?.mino)
-                console.log(core?.board)
+                core?.harddrop(movement)
             },
         }
 
@@ -64,6 +71,11 @@ export function Game() {
         setBoard(core?.board)
         setPoints(core?.score!)
     }, [])
+
+    store.subscribe(() => {
+        if (!coreRef.current) return;
+        coreRef.current.setThreshold(store.getState().input.threshold)
+    })
 
     useEffect(() => {
         if (!gameRef.current) return undefined
@@ -75,12 +87,13 @@ export function Game() {
     }, [handleKey])
 
     useEffect(() => {
-        const interval = setInterval(() => setTime(Date.now()), 400);
+        const { movement } = store.getState().input
+        const interval = setInterval(() => setTime(Date.now()), 400 * movement);
         const core = coreRef.current
         if (core) {
-            core?.move(0, 1)
-            setBoard(core?.board)
-            setPoints(core?.score!)
+            core.move(0, movement)
+            setBoard(core.board)
+            setPoints(core.score!)
             if (!board) clearInterval(interval)
         }
         return () => {
