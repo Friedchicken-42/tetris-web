@@ -3,6 +3,10 @@
     justify-content: center;
 }
 
+.board {
+    position: relative;
+}
+
 .preview {
     margin-top: 5em;
 }
@@ -11,4 +15,26 @@
     color: #fff;
     font-size: 4em;
     margin: .2em;
+}
+
+.warning {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    padding: .2em;
+    color: #f11;
+    font-size: 2em;
+    font-weight: bold;
+    border: .2em solid;
+    border-radius: .4em;
+    pointer-events: none;
+}
+
+.focus {
+    top: 30%;
+}
+
+.end {
+    font-size: 3em;
+    top: 50%;
 }

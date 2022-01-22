@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from 'react'
+import React, { useState } from 'react'
 import './userInput.css'
 import store from '../store'
 
@@ -32,8 +32,8 @@ function Input({name, value }: InputProps) {
 
 export function UserInput() {
     const base = {
-        "movement": 1,
-        "rotation": 90,
+        "movement": .5,
+        "rotation": 45,
         "threshold": 10,
     }
 

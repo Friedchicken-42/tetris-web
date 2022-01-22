@@ -10,6 +10,10 @@ type ScoreProps = {
     points: number
 }
 
+type Status = {
+    [key in '' | 'playing' | 'end' as string]: () => Board
+}
+
 function Score({points}: ScoreProps) {
     const score = points.toString().padStart(10, '0')
     return <div className="score">{score}</div>
@@ -20,7 +24,6 @@ export function Game() {
     const [board, setBoard] = useState<Board>()
     const [points, setPoints] = useState<number>(0)
     const [status, done] = useState<boolean>(false)
-    const [time, setTime] = useState(Date.now())
 
     useEffect(() => {
         const init = async () => {
@@ -32,6 +35,7 @@ export function Game() {
         }
         init()
     }, [])
+
     const gameRef = useRef<HTMLDivElement>(null)
 
     const handleKey = useCallback((event: KeyboardEvent) => {
@@ -67,7 +71,7 @@ export function Game() {
             },
         }
 
-        mapping[event.key]?.()
+        if (core.board) mapping[event.key]?.()
         setBoard(core?.board)
         setPoints(core?.score!)
     }, [])
@@ -77,14 +81,26 @@ export function Game() {
         coreRef.current.setThreshold(store.getState().input.threshold)
     })
 
+    const [show, setShow] = useState<boolean>(true)
+
+    const handleFocus = useCallback((event: FocusEvent) => {
+        setShow(event.type === 'focusout')
+    }, [])
+
     useEffect(() => {
         if (!gameRef.current) return undefined
         const div: HTMLDivElement = gameRef.current
         div.addEventListener('keydown', handleKey)
+        div.addEventListener('focusin', handleFocus)
+        div.addEventListener('focusout', handleFocus)
         return () => {
             div.removeEventListener('keydown', handleKey)
+            div.removeEventListener('focusin', handleFocus)
+            div.removeEventListener('focusout', handleFocus)
         }
     }, [handleKey])
+
+    const [time, setTime] = useState(Date.now())
 
     useEffect(() => {
         const { movement } = store.getState().input
@@ -94,7 +110,6 @@ export function Game() {
             core.move(0, movement)
             setBoard(core.board)
             setPoints(core.score!)
-            if (!board) clearInterval(interval)
         }
         return () => {
             clearInterval(interval)
@@ -103,26 +118,26 @@ export function Game() {
 
     return (
         <div ref={gameRef}>
-            {!status
-                ? <div className="game">
-                    <div>
-                    <Score points={0} />
-                    <Playfield board={new Board(10, 20)} multiplier={50} />
-                    </div>
-                    <div className="preview">
-                        <Preview queue={[null, null, null, null, null]} />
-                    </div>
+            <div className="game">
+                <div className="board">
+                    <Score points={status ? points! : 0} />
+                    <Playfield
+                        board={!status ? new Board(10, 20) : coreRef.current!.board ?? coreRef.current!.backup}
+                        multiplier={50}
+                    />
+                    {show && (
+                    <div className="warning focus">Board not on focus</div>
+                    )}
+                    {status && !coreRef.current!.board && (
+                    <div className="warning end">Game Over</div>
+                    )}
                 </div>
-                : <div className="game">
-                    <div>
-                        <Score points={points!} />
-                        <Playfield board={board ?? coreRef.current?.backup!} multiplier={50} />
-                    </div>
-                    <div className="preview">
-                        <Preview queue={coreRef.current!.queue} />
-                    </div>
+                <div className="preview">
+                    <Preview
+                        queue={status ? coreRef.current!.queue : [null, null, null, null, null]}
+                    />
                 </div>
-            }
+            </div>
         </div>
     )
 }
