@@ -27,7 +27,7 @@ jobs:
       - name: add intersection
         run: yarn add https://github.com/Friedchicken-42/intersection
       - name: build
-        run: yarn install
+        run: yarn build 
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
