@@ -10,10 +10,6 @@ type ScoreProps = {
     points: number
 }
 
-type Status = {
-    [key in '' | 'playing' | 'end' as string]: () => Board
-}
-
 function Score({points}: ScoreProps) {
     const score = points.toString().padStart(10, '0')
     return <div className="score">{score}</div>
@@ -21,17 +17,19 @@ function Score({points}: ScoreProps) {
 
 export function Game() {
     const coreRef = useRef<Core>()
-    const [board, setBoard] = useState<Board>()
-    const [points, setPoints] = useState<number>(0)
+    const [time, setTime] = useState(Date.now())
+    const [_, setRender] = useState(Date.now())
     const [status, done] = useState<boolean>(false)
+
+    const rerender = () => setRender(Date.now())
 
     useEffect(() => {
         const init = async () => {
             const pieces: MinoJSON[] = await fetch(`${process.env.PUBLIC_URL  }/pieces.json`)
                 .then(data => data.json())
             coreRef.current = new Core(10, 20, pieces)
-            setBoard(coreRef.current.board)
             done(true)
+            rerender()
         }
         init()
     }, [])
@@ -72,8 +70,7 @@ export function Game() {
         }
 
         if (core.board) mapping[event.key]?.()
-        setBoard(core?.board)
-        setPoints(core?.score!)
+        rerender()
     }, [])
 
     store.subscribe(() => {
@@ -100,16 +97,13 @@ export function Game() {
         }
     }, [handleKey])
 
-    const [time, setTime] = useState(Date.now())
-
     useEffect(() => {
         const { movement } = store.getState().input
         const interval = setInterval(() => setTime(Date.now()), 400 * movement);
         const core = coreRef.current
         if (core) {
             core.move(0, movement)
-            setBoard(core.board)
-            setPoints(core.score!)
+            rerender()
         }
         return () => {
             clearInterval(interval)
@@ -120,7 +114,7 @@ export function Game() {
         <div ref={gameRef}>
             <div className="game">
                 <div className="board">
-                    <Score points={status ? points! : 0} />
+                    <Score points={status ? coreRef.current!.score : 0} />
                     <Playfield
                         board={!status ? new Board(10, 20) : coreRef.current!.board ?? coreRef.current!.backup}
                         multiplier={50}

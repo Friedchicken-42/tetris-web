@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, MutableRefObject } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Board, Cell } from '../logic/Core'
 import { RGBToHex } from '../logic/Color'
 
