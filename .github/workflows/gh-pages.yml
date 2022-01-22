@@ -22,10 +22,12 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - name: build page
-        run: |
-          yarn install
-          yarn build
+      - name: install dependencies 
+        run: yarn install
+      - name: add intersection
+        run: yarn add https://github.com/Friedchicken-42/intersection
+      - name: build
+        run: yarn install
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
