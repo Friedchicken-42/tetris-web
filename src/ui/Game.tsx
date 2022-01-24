@@ -69,7 +69,6 @@ export function Game() {
                 core?.harddrop(movement)
             },
         }
-        console.log(event.key)
 
         if (core.board) mapping[event.key]?.()
         rerender()
