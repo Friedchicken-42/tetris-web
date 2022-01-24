@@ -17,7 +17,7 @@ class Core {
 
     backup: Board;
 
-    board: Board;
+    board: Board | null;
 
     pieces: MinoJSON[]
  
@@ -34,7 +34,7 @@ class Core {
     lock: number;
 
     maxLock: number;
-    
+
     constructor(width: number, height: number, pieces: MinoJSON[]) {
         this.width = width
         this.height = height
@@ -51,7 +51,7 @@ class Core {
         this.queue = queue as Mino[]
 
         this.mino = this.nextMino()
-
+        this.mino.centerBoard(this.width, 0)
         this.board = this.board.merge(this.mino)!
 
         this.threshold = 1
@@ -129,7 +129,7 @@ class Core {
     }
 
     clearLines() {
-        const lines = this.board.clearLines(this.threshold)
+        const lines = this.board!.clearLines(this.threshold)
         const points = lines ** 2 * 100
         this.score += points
     }
@@ -140,8 +140,8 @@ class Core {
         this.backup = this.board
         this.clearLines()
         this.mino = this.nextMino()
-        this.mino.move(1, 1)
-        this.board = this.board.merge(this.mino)!
+        this.mino.centerBoard(this.board.width, 0)
+        this.board = this.board.merge(this.mino)
     }
 }
 

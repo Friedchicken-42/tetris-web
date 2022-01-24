@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef, useState } from 'react'
+import React, { useEffect, useCallback, useRef, useState, useMemo } from 'react'
 import store from '../store'
 import { Playfield } from './Playfield'
 import { Preview } from './Preview'
@@ -110,6 +110,14 @@ export function Game() {
         }
     }, [time])
 
+    const preview = useMemo(() => (
+        <div className="preview">
+            <Preview
+                queue={status ? coreRef.current!.queue : [null, null, null, null, null]}
+            />
+        </div>
+    ), [coreRef.current?.mino])
+
     return (
         <div ref={gameRef}>
             <div className="game">
@@ -126,11 +134,7 @@ export function Game() {
                     <div className="warning end">Game Over</div>
                     )}
                 </div>
-                <div className="preview">
-                    <Preview
-                        queue={status ? coreRef.current!.queue : [null, null, null, null, null]}
-                    />
-                </div>
+                {preview}
             </div>
         </div>
     )

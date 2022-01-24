@@ -3,6 +3,11 @@ import { Vector3 } from './Vector3'
 import { Block } from './Block'
 import { Color, hexToRGB } from './Color'
 
+type Container = {
+    start: Point
+    end: Point
+}
+
 class Mino {
     name: string;
 
@@ -47,16 +52,26 @@ class Mino {
         }
     }
     
-    getContainer(): Point {
-        const container = this.blocks.reduce(( prev, block) => {
-            let x = block.polygon.center.x + .5
-            let y = block.polygon.center.y + .5
+    container(): Container {
+        const end = this.blocks.reduce(( prev, block) => {
+            let { x, y } = block.polygon.center
+            x += .5
+            y += .5
             x = x > prev.x ? x : prev.x
             y = y > prev.y ? y : prev.y
             return new Point(x, y)
-        }, new Point(0, 0))
+        }, this.blocks[0].polygon.points[0])
 
-        return container
+        const start = this.blocks.reduce(( prev, block) => {
+            let { x, y } = block.polygon.center
+            x -= .5
+            y -= .5
+            x = x < prev.x ? x : prev.x
+            y = y < prev.y ? y : prev.y
+            return new Point(x, y)
+        }, this.blocks[0].polygon.points[0])
+
+        return { start, end }
     }
 
     round() {
@@ -68,6 +83,20 @@ class Mino {
             }
             polygon.setCenter()
         }
+    }
+
+    centerBoard(boardWidth: number, boardHeight: number) {
+        const { start, end } = this.container() 
+        const width = end.x - start.x
+        const resw = boardWidth / 2 - width / 2
+        const offX = resw - start.x
+
+        const height = end.y - start.y
+        const resh = boardHeight / 2 - height / 2
+        let offY = resh - start.y
+        offY = boardHeight === 0 ? 0 : offY
+
+        this.move(offX, offY)
     }
 }
         

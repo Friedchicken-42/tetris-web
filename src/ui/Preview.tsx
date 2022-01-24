@@ -13,6 +13,7 @@ export function Preview({ queue }: PreviewProps) {
         <div className="container">
         {queue.slice(0, 5).map((mino: Mino | null, idx: number) => {
             let board = new Board(5, 5)
+            mino?.centerBoard(5, 5)
             board = mino ? board.merge(mino)! : board
             const multiplier = 20 * (idx === 0 ? 1.5 : 1)
             /* eslint-disable-next-line */
