@@ -27,6 +27,10 @@ class Core {
 
     mino: Mino;
 
+    hold: Mino | null;
+
+    canHold: boolean;
+
     threshold: number;
 
     score: number;
@@ -53,6 +57,9 @@ class Core {
         this.mino = this.nextMino()
         this.mino.centerBoard(this.width, 0)
         this.board = this.board.merge(this.mino)!
+
+        this.hold = null
+        this.canHold = true
 
         this.threshold = 1
         this.score = 0
@@ -134,12 +141,27 @@ class Core {
         this.score += points
     }
 
+    holdMino() {
+        if(!this.canHold) return;
+        const tmp = this.hold
+        this.hold = this.mino
+        this.hold.rotate(-this.mino.rotation)
+        if(tmp) {
+            this.mino = tmp
+        } else {
+            this.mino = this.nextMino()
+        }
+        this.mino.centerBoard(this.board!.width, 0)
+        this.canHold = false
+    }
+
     place() {
         if (!this.board) return;
         this.lock = 0
         this.backup = this.board
         this.clearLines()
         this.mino = this.nextMino()
+        this.canHold = true
         this.mino.centerBoard(this.board.width, 0)
         this.board = this.board.merge(this.mino)
     }

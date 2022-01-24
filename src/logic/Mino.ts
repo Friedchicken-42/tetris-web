@@ -15,6 +15,8 @@ class Mino {
 
     center: Point;
 
+    rotation: number;
+
     color: Color;
 
     constructor(name: string, coords: Vector3[], center: number[] | null, color: string) {
@@ -30,6 +32,8 @@ class Mino {
             ])
             this.blocks.push(new Block(square, z))
         }
+
+        this.rotation = 0
 
         if (center) {
             this.center = new Point(center[0] + .5, center[1] + .5)
@@ -50,6 +54,7 @@ class Mino {
         for (let i = 0; i < this.blocks.length; i += 1) {
             this.blocks[i].polygon.rotateFromPoint(angle, this.center)
         }
+        this.rotation = (this.rotation + angle) % (Math.PI * 2)
     }
     
     container(): Container {

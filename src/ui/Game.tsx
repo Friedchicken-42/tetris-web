@@ -64,10 +64,12 @@ export function Game() {
             's': () => {
                 core?.rotate(-radians * 2)
             },
+            'Shift': () => core?.holdMino(),
             ' ': () => {
                 core?.harddrop(movement)
             },
         }
+        console.log(event.key)
 
         if (core.board) mapping[event.key]?.()
         rerender()
@@ -118,9 +120,25 @@ export function Game() {
         </div>
     ), [coreRef.current?.mino])
 
+    const hold = useMemo(() => {
+        let board = new Board(5, 5)
+        if(coreRef.current?.hold){
+            coreRef.current!.hold.centerBoard(5, 5)
+            board = board.merge(coreRef.current!.hold)!
+        }
+        return <div className="preview">
+            <div className="container">
+                <div className="element">
+                    <Playfield board={board} multiplier={40} />
+                </div>
+            </div>
+        </div>
+    }, [coreRef.current?.mino])
+
     return (
         <div ref={gameRef}>
             <div className="game">
+                {hold}
                 <div className="board">
                     <Score points={status ? coreRef.current!.score : 0} />
                     <Playfield
