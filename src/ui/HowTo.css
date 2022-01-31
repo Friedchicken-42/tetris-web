@@ -1,0 +1,18 @@
+.example {
+    margin: 1em;
+}
+
+.example-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.example-arrow {
+    font-weight: bolder;
+    margin: 1em;
+}
+
+.example-text {
+    font-size: small;
+}

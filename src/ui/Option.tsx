@@ -48,6 +48,11 @@ export const controls = [
         title: 'swap hold piece',
         command: 'hold',
     },
+    {
+        key: 'r',
+        title: 'restart game',
+        command: 'restart'
+    },
 ]
 
 type ControlProps = {

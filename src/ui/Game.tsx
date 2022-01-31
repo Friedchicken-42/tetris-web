@@ -58,6 +58,11 @@ export function Game() {
             'ccw2': () => core?.rotate(radians * 2),
             'cw2': () => core?.rotate(-radians * 2),
             'hold': () => core?.holdMino(),
+            'restart': async () => {
+                const pieces: MinoJSON[] = await fetch(`${process.env.PUBLIC_URL  }/pieces.json`)
+                    .then(data => data.json())
+                coreRef.current = new Core(10, 20, pieces)
+            },
         }
 
         if (core.board) {

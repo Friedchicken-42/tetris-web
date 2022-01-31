@@ -3,6 +3,7 @@ import './App.css';
 import { Game } from './Game'
 import { UserInput } from './UserInput'
 import { Option, controls } from './Option'
+import { HowTo } from './HowTo'
 import store from '../store'
 
 function Menu() {
@@ -29,7 +30,7 @@ function Menu() {
         </div>
         <div>
         <button type="button" onClick={() => setPage('howto')}>
-            How to play 
+            How this works 
         </button>
         </div>
     </div>
@@ -51,18 +52,6 @@ function Editor() {
 
     return <div>
         <h1>Editor</h1>
-        <h2>WIP</h2>
-        <button type="button" onClick={() => setPage('menu')}>
-            Back 
-        </button>
-    </div>
-}
-
-function HowTo() {
-    const { setPage } = store.state
-    
-    return <div>
-        <h1>HowTo</h1>
         <h2>WIP</h2>
         <button type="button" onClick={() => setPage('menu')}>
             Back 
