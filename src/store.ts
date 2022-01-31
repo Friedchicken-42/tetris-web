@@ -1,15 +1,22 @@
-import { createStore } from 'redux'
+type Callback = () => void;
 
-const reducer = (state: any, action: any) => {
-    const data = state
-
-    data[action.type] = {
-        ...data[action.type],
-        ...action.payload
-    }
-
-    return data 
+type Store = {
+    state: any;
+    callbacks: Callback[];
+    dispatch: (name: string, payload: any) => void;
+    subscribe:(callback: Callback) => void;
 }
 
-const store = createStore(reducer, {})
+const store: Store = {
+    state: {},
+    callbacks: [],
+    dispatch(name: string, payload: any) {
+        this.state[name] = payload
+        this.callbacks.forEach(callback => callback())
+    },
+    subscribe(callback: Callback) {
+        this.callbacks.push(callback)
+    },
+}
+
 export default store;

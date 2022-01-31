@@ -19,9 +19,12 @@ function Input({ name, value, min, max }: InputProps) {
     const save = (a: string, b: string) => {
         const num = parseFloat(b)
         if(num >= min && (max === undefined || num <= max))
-            store.dispatch({type: 'input', payload: {[a]: num}})
+            store.dispatch('input', {
+                ...store.state.input,
+                [a]: num,
+            })
         else 
-            setValue(store.getState().input[a])
+            setValue(store.state.input[a])
     }
 
     return <div className="input-element">
@@ -55,11 +58,9 @@ export function UserInput() {
             name: "threshold",
             value: 10,
             min: 1,
-            max: 10,
         }
     ]
-
-    base.forEach(({ name, value }) => store.dispatch({type: 'input', payload: {[name]: value}}))
+    store.dispatch('input', base.reduce((prev, curr) => ({ ...prev, [curr.name]: curr.value }), {}))
     
     return <div className="container-input" >
         {base.map(

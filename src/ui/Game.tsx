@@ -32,6 +32,12 @@ export function Game() {
             rerender()
         }
         init()
+
+        store.subscribe(() => {
+            if (!coreRef.current) return;
+            coreRef.current.setThreshold(store.state.input.threshold)
+        })
+
     }, [])
 
     const gameRef = useRef<HTMLDivElement>(null)
@@ -39,7 +45,7 @@ export function Game() {
     const handleKey = useCallback((event: KeyboardEvent) => {
         const core = coreRef.current
         if (!core) return;
-        const { movement, rotation } = store.getState().input
+        const { movement, rotation } = store.state.input
         const radians = rotation * (Math.PI / 180)
 
         const mapping: { [key: string]: () => void } = {
@@ -55,17 +61,12 @@ export function Game() {
         }
 
         if (core.board) {
-            const { keys }= store.getState().controls
-            const key = keys.filter((control: any) => control.key === event.key)[0]
+            const { controls }= store.state
+            const key = controls.filter((control: any) => control.key === event.key)[0]
             if(key) mapping[key.command]?.()
         }
         rerender()
     }, [])
-
-    store.subscribe(() => {
-        if (!coreRef.current) return;
-        coreRef.current.setThreshold(store.getState().input.threshold)
-    })
 
     const [show, setShow] = useState<boolean>(true)
 
@@ -87,7 +88,7 @@ export function Game() {
     }, [handleKey])
 
     useEffect(() => {
-        const { movement } = store.getState().input
+        const { movement } = store.state.input
         const interval = setInterval(() => setTime(Date.now()), 400 * movement);
         const core = coreRef.current
         if (core) {

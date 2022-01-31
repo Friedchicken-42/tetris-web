@@ -95,13 +95,13 @@ function Control({ bind, title, index }: ControlProps) {
 }
 
 export function Option() {
-    const state = store.getState()
-    const { setPage } = state.page
+    const { state } = store
+    const { setPage } = state
 
-    store.dispatch({type: 'controls', payload: {keys: controls}})
+    store.dispatch('controls', controls)
 
     const handleClick = () => {
-        store.dispatch({type: 'controls', payload: {keys: controls}})
+        store.dispatch('controls', controls)
         setPage('menu')
     }
 
@@ -111,7 +111,7 @@ export function Option() {
         Back
         </button>
         <div className="controls">
-            {state.controls.keys.map((c: ControlType, idx: number) => <Control key={c.key} bind={c.key} title={c.title} index={idx}/>)}
+            {state.controls.map((c: ControlType, idx: number) => <Control key={c.key} bind={c.key} title={c.title} index={idx}/>)}
         </div>
     </div>
 }

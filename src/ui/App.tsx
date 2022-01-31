@@ -6,8 +6,8 @@ import { Option, controls } from './Option'
 import store from '../store'
 
 function Menu() {
-    const { setPage } = store.getState().page
-    store.dispatch({type: 'controls', payload: {keys: controls}})
+    const { setPage } = store.state
+    store.dispatch('controls', controls)
 
     return <div>
         <h1>Hello</h1>
@@ -36,7 +36,7 @@ function Menu() {
 }
 
 function Main() {
-    const { setPage } = store.getState().page
+    const { setPage } = store.state
     // add back button
 
     return <div className="Main">
@@ -47,7 +47,7 @@ function Main() {
 }
 
 function Editor() {
-    const { setPage } = store.getState().page
+    const { setPage } = store.state
 
     return <div>
         <h1>Editor</h1>
@@ -59,7 +59,7 @@ function Editor() {
 }
 
 function HowTo() {
-    const { setPage } = store.getState().page
+    const { setPage } = store.state
     
     return <div>
         <h1>HowTo</h1>
@@ -85,8 +85,7 @@ const pages: PagesType<ReactNode> = {
 
 function App() {
     const [page, setPage] = useState<PageType>('menu')
-    store.dispatch({type: 'page', payload: {setPage}})
-
+    store.dispatch('setPage', setPage)
 
     return (
         <div className="App">
