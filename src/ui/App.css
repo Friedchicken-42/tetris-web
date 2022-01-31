@@ -1,6 +1,20 @@
+.App {
+    text-align: center;
+    color: #fff;
+}
+
+button {
+    border: solid #fff 5px;
+    border-radius: 10px;
+    background-color: #0000;
+    font-size: 1.5em;
+    padding: 5px 10px;
+    margin: 5px;
+    color: #fff;
+}
+
 .Main{
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
-    text-align: center;
+    justify-content: space-evenly 
 }

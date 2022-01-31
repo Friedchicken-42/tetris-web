@@ -1,0 +1,28 @@
+.controls {
+    padding: 1em 25%;
+}
+
+.control {
+    display: flex;
+    justify-content: space-between;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    margin: 1em;
+    padding: 1em;
+    font-size: 1.4em;
+}
+
+.control-left {
+    font-weight: bold;
+    width: 60%;
+}
+
+.control-right {
+    width: 30%;
+    background-color: #222;
+    border: 2px solid #111;
+    text-align: center;
+    padding: 6px;
+    color: #fff;
+    font-weight: bold;
+}

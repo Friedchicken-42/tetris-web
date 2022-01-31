@@ -2,16 +2,12 @@ import { createStore } from 'redux'
 
 const reducer = (state: any, action: any) => {
     const data = state
-    switch(action.type) {
-        case 'input':
-            data.input = {
-                ...data.input,
-                ...action.payload
-            }
-            break
-        default:
-            break;
+
+    data[action.type] = {
+        ...data[action.type],
+        ...action.payload
     }
+
     return data 
 }
 

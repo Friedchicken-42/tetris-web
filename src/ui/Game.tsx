@@ -43,34 +43,22 @@ export function Game() {
         const radians = rotation * (Math.PI / 180)
 
         const mapping: { [key: string]: () => void } = {
-            'ArrowRight': () => {
-                core?.move(movement, 0)
-            },
-            'ArrowLeft': () => {
-                core?.move(-movement, 0)
-            },
-            'ArrowDown': () => {
-                core?.move(0, movement)
-            },
-            'z': () => {
-                core?.rotate(radians)
-            },
-            'x': () => {
-                core?.rotate(-radians)
-            },
-            'a': () => {
-                core?.rotate(radians * 2)
-            },
-            's': () => {
-                core?.rotate(-radians * 2)
-            },
-            'Shift': () => core?.holdMino(),
-            ' ': () => {
-                core?.harddrop(movement)
-            },
+            'right': () => core?.move(movement, 0),
+            'left': () => core?.move(-movement, 0),
+            'softdrop': () => core?.move(0, movement),
+            'harddrop': () => core?.harddrop(movement),
+            'ccw': () => core?.rotate(radians),
+            'cw': () => core?.rotate(-radians),
+            'ccw2': () => core?.rotate(radians * 2),
+            'cw2': () => core?.rotate(-radians * 2),
+            'hold': () => core?.holdMino(),
         }
 
-        if (core.board) mapping[event.key]?.()
+        if (core.board) {
+            const { keys }= store.getState().controls
+            const key = keys.filter((control: any) => control.key === event.key)[0]
+            if(key) mapping[key.command]?.()
+        }
         rerender()
     }, [])
 
