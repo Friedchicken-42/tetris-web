@@ -37,7 +37,6 @@ function Menu() {
 }
 
 function Main() {
-    const { setPage } = store.state
     // add back button
 
     return <div className="Main">

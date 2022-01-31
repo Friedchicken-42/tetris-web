@@ -136,7 +136,7 @@ export function Game() {
                     <Score points={status ? coreRef.current!.score : 0} />
                     <Playfield
                         board={!status ? new Board(10, 20) : coreRef.current!.board ?? coreRef.current!.backup}
-                        multiplier={50}
+                        multiplier={0}
                     />
                     {show && (
                     <div className="warning focus">Board not on focus</div>

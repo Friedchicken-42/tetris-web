@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Board, Cell } from '../logic/Core'
 import { RGBToHex } from '../logic/Color'
+import { windowDimension } from './Dimension'
 
 type PlayfieldProps = {
     board: Board
@@ -12,29 +13,25 @@ export function Playfield({ board, multiplier }: PlayfieldProps) {
 
     const [time, setTime] = useState(Date.now())
     const canvasRef = useRef<HTMLCanvasElement>(null)
+
+    const { height } = windowDimension();
+    const multi = multiplier === 0
+        ? (height - 200) / board.height
+        : multiplier
     
     const drawCell = (ctx: any, cell: Cell) => {
         const { position, color, area } = cell
 
-        ctx.fillStyle = '#000'
-
-        ctx.fillRect(
-            position.x * multiplier,
-            position.y * multiplier,
-            multiplier,
-            multiplier
-        )
-        
         const hex = RGBToHex(color)
         const alpha = Math.round(area * 255).toString(16)
 
         ctx.fillStyle = area === 0 ? '#111' : hex + alpha;
 
         ctx.fillRect(
-            position.x * multiplier + lineWidth,
-            position.y * multiplier + lineWidth,
-            multiplier - lineWidth * 2,
-            multiplier - lineWidth * 2
+            position.x * multi + lineWidth,
+            position.y * multi + lineWidth,
+            multi - lineWidth * 2,
+            multi - lineWidth * 2
         )
 
         /*
@@ -51,7 +48,9 @@ export function Playfield({ board, multiplier }: PlayfieldProps) {
         const ctx = canvas.getContext('2d')
         if (!ctx) return
         ctx.clearRect(0, 0, canvas.width, canvas.height)
-        ctx.lineWidth = 0
+
+        ctx.fillStyle = '#000'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
 
         board.cells.forEach((cells: Cell[]) => {
             cells.forEach((cell: Cell) => {
@@ -70,6 +69,6 @@ export function Playfield({ board, multiplier }: PlayfieldProps) {
 
     return <div className="playfield">
         {/* eslint-disable-next-line */}
-        <canvas ref={canvasRef} width={board.width * multiplier} height={board.height * multiplier} tabIndex={1}/>
+        <canvas ref={canvasRef} width={board.width * multi} height={board.height * multi} tabIndex={1}/>
     </div>
 }
